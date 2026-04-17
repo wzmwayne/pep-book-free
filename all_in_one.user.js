@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         人教课本爬取器-通过打印PDF
 // @namespace    http://tampermonkey.net/
-// @version      0.9
+// @version      1.0
 // @description  极简样式，使用浏览器打印接口生成PDF
 // @author       You
 // @match        https://book.pep.com.cn/*
@@ -136,7 +136,6 @@
     function createPrintWindow(bookId, timeId, start, end) {
         let imgsHtml = '';
         for (let i = start; i <= end; i++) {
-            // 每张图片直接放在 div 中，不做任何分页控制
             imgsHtml += `<div style="text-align:center; margin:0; padding:0;"><img id="img_${i}" src="https://book.pep.com.cn/${bookId}/files/mobile/${i}.jpg?${timeId}" style="width:100%; height:auto; display:block;" onerror="this.style.display='none'"></div>`;
         }
 
@@ -147,7 +146,6 @@
                 <meta charset="UTF-8">
                 <title>打印预览 - ${bookId}</title>
                 <style>
-                    /* 极简重置，完全依赖浏览器自动分页 */
                     * {
                         margin: 0;
                         padding: 0;
@@ -156,11 +154,9 @@
                     body {
                         background: white;
                     }
-                    /* 打印时去除默认页边距 */
                     @page {
                         margin: 0;
                     }
-                    /* 悬浮状态面板 */
                     #statusArea {
                         position: fixed;
                         top: 10px;
@@ -198,6 +194,7 @@
                 <script>
                     const total = ${end - start + 1};
                     let loaded = 0;
+                    let timeoutTriggered = false;
                     const statusDiv = document.getElementById('statusArea');
                     const controlDiv = document.getElementById('controlPanel');
                     const printBtn = document.getElementById('printActionBtn');
@@ -211,8 +208,12 @@
                     }
 
                     function imageLoaded() {
+                        if (timeoutTriggered) return;
                         loaded++;
                         updateStatus();
+                        if (loaded >= total) {
+                            clearTimeout(timeoutId);
+                        }
                     }
 
                     for (let i = ${start}; i <= ${end}; i++) {
@@ -223,6 +224,7 @@
                             } else {
                                 img.addEventListener('load', imageLoaded);
                                 img.addEventListener('error', function() {
+                                    // 加载失败也计数，避免卡死
                                     imageLoaded();
                                 });
                             }
@@ -231,8 +233,9 @@
                         }
                     }
 
-                    setTimeout(() => {
+                    const timeoutId = setTimeout(() => {
                         if (loaded < total) {
+                            timeoutTriggered = true;
                             loaded = total;
                             updateStatus();
                         }
@@ -281,4 +284,42 @@
         }
         const url = urls[idx];
         const page = idx + 1;
-        if (typeof GM_down
+        if (typeof GM_download !== 'undefined') {
+            GM_download({
+                url: url,
+                name: `${bookId}_page_${page}.jpg`,
+                headers: { 'Referer': 'https://book.pep.com.cn/' },
+                onload: () => {
+                    addDebugMessage(`第${page}张下载成功`);
+                    setTimeout(() => downloadImage(idx + 1, urls, bookId), 300);
+                },
+                onerror: (e) => {
+                    addDebugMessage(`GM_download失败: ${e}`);
+                    fallbackFetch(url, bookId, page, () => setTimeout(() => downloadImage(idx + 1, urls, bookId), 300));
+                }
+            });
+        } else {
+            fallbackFetch(url, bookId, page, () => setTimeout(() => downloadImage(idx + 1, urls, bookId), 300));
+        }
+    }
+
+    function fallbackFetch(url, bookId, page, cb) {
+        fetch(url, { headers: { 'Referer': 'https://book.pep.com.cn/' } })
+            .then(r => r.blob())
+            .then(b => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(b);
+                a.download = `${bookId}_page_${page}.jpg`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+                addDebugMessage(`fetch下载第${page}张成功`);
+                cb();
+            })
+            .catch(e => {
+                addDebugMessage(`fetch下载失败: ${e}`);
+                cb();
+            });
+    }
+
+    createMainPanel();
+})();
