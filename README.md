@@ -11,4 +11,7 @@ https://edgeone.gh-proxy.org/github.com/wzmwayne/pep-book-free/raw/refs/heads/ma
 
 https://hk.gh-proxy.org/github.com/wzmwayne/pep-book-free/raw/refs/heads/main/main.user.js
 
-以上链接为镜像，不对质量担保
+以上镜像，不对质量担保
+
+https://github.com/wzmwayne/pep-book-free/raw/refs/heads/main/all_in_one.user.js
+加强版无需py脚本
