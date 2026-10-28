@@ -1,17 +1,18 @@
-# pep-book-free
-免费下载人教书本
+# 声明
 
-https://github.com/wzmwayne/pep-book-free/raw/refs/heads/main/main.user.js
+因学业原因，本人暂时放缓各项目的更新，学业告一段落后继续。
 
-https://gh-proxy.org/github.com/wzmwayne/pep-book-free/raw/refs/heads/main/main.user.js
+- 账号下的仓库目前设为**归档（只读）**，推送与合并请求会暂停处理；
+- 暂停期间页面与功能不保证更新速度，恢复后照常维护；
+- 原有说明文档已移至 `_readme.md`，内容保持不变。
 
-https://cdn.gh-proxy.org/github.com/wzmwayne/pep-book-free/raw/refs/heads/main/main.user.js
+## 为什么关注 keepandroidopen.org
 
-https://edgeone.gh-proxy.org/github.com/wzmwayne/pep-book-free/raw/refs/heads/main/main.user.js
+安卓正在从「开放安装」走向受控分发：侧载限制、开发者验证、平台签名垄断，
+会直接压缩个人开发者与普通用户的空间。这与项目是否更新无关，值得持续关注。
 
-https://hk.gh-proxy.org/github.com/wzmwayne/pep-book-free/raw/refs/heads/main/main.user.js
+<https://keepandroidopen.org>
 
-以上镜像，不对质量担保
+## 许可
 
-https://github.com/wzmwayne/pep-book-free/raw/refs/heads/main/all_in_one.user.js
-加强版无需py脚本
+放弃所有权利（Unlicense / 公有领域），可自由取用、修改与再分发。
